@@ -1,20 +1,27 @@
 # Agent Huddle - Sticky Notes
 
-A Freshworks Platform 3.0 sample app that provides a "Sticky Note" area in the ticket sidebar using Entity Storage (Custom Objects).
+A Freshworks Platform 3.0 sample app that provides a "Sticky Note" area in the ticket sidebar using **Entity Storage (Custom Objects)**.
 
 ## Description
 
 Often, agents need to leave "private context" on a ticket that isn't a formal private note—like a temporary reminder or a "heads up" for the next shift. This app provides a "Sticky Note" area in the sidebar that saves data specifically to that ticket using the platform's own storage.
 
-![Ticket Sidebar](screenshots/1.png)
+### Core Functionality: Entity Storage (Custom Objects)
 
-**Two interfaces:**
+The heart of this app is **Entity Storage**, which allows for structured data persistence. Unlike simple key-value storage, Entity Storage enables:
+- **Relational Data**: Notes are linked to specific `ticket_id`s.
+- **Advanced Querying**: Efficiently fetching all notes or filtering by specific fields.
+- **Structured Schemas**: Defined fields for `ticket_id` and `note_content`.
+
+## User Interfaces
+
+The app provides two distinct interfaces to interact with the stored notes:
 
 1. **Ticket Sidebar** - A sticky note text area where agents can quickly jot down private context for the current ticket. Notes are automatically loaded when revisiting a ticket.
+<img src="screenshots/1.png" width="400" alt="Ticket Sidebar">
 
 2. **Full Page App** - A dashboard displaying all saved notes across tickets with edit and delete capabilities.
-
-![Full Page App](screenshots/2.png)
+<img src="screenshots/2.png" width="600" alt="Full Page App">
 
 ## Platform 3.0 Features Used
 
