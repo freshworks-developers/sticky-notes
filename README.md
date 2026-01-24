@@ -6,11 +6,15 @@ A Freshworks Platform 3.0 sample app that provides a "Sticky Note" area in the t
 
 Often, agents need to leave "private context" on a ticket that isn't a formal private note—like a temporary reminder or a "heads up" for the next shift. This app provides a "Sticky Note" area in the sidebar that saves data specifically to that ticket using the platform's own storage.
 
+![Ticket Sidebar](screenshots/1.png)
+
 **Two interfaces:**
 
 1. **Ticket Sidebar** - A sticky note text area where agents can quickly jot down private context for the current ticket. Notes are automatically loaded when revisiting a ticket.
 
 2. **Full Page App** - A dashboard displaying all saved notes across tickets with edit and delete capabilities.
+
+![Full Page App](screenshots/2.png)
 
 ## Platform 3.0 Features Used
 
