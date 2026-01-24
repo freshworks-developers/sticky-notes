@@ -6,6 +6,8 @@ A Freshworks Platform 3.0 sample app that provides a "Sticky Note" area in the t
 
 Often, agents need to leave "private context" on a ticket that isn't a formal private note—like a temporary reminder or a "heads up" for the next shift. This app provides a "Sticky Note" area in the sidebar that saves data specifically to that ticket using the platform's own storage.
 
+Currently, native private notes do not allow an agent to view all the ticket notes in a consolidated view to act upon it or take decisions based on the same. **Sticky-Notes** is an easy-to-use, and customizable app that lets agents view important ticket notes when agents change shifts.
+
 ### Core Functionality: Entity Storage (Custom Objects)
 
 The heart of this app is **Entity Storage**, which allows for structured data persistence. Unlike simple key-value storage, Entity Storage enables:
