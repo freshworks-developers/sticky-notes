@@ -1,25 +1,35 @@
 {
   "platform-version": "3.0",
+  "app": {
+    "tracking_id": "stickynotes000001",
+    "start_time": "2026-06-17T00:00:00.000Z"
+  },
+  "metaConfig": {
+    "framework": "react"
+  },
   "modules": {
     "common": {
       "location": {
         "full_page_app": {
-          "url": "full_page.html",
-          "icon": "styles/images/icon.svg"
+          "url": "index.html",
+          "icon": "icon.svg"
         }
       }
     },
     "support_ticket": {
       "location": {
         "ticket_sidebar": {
-          "url": "index.html",
-          "icon": "styles/images/icon.svg"
+          "url": "ticketSidebar.html",
+          "icon": "icon.svg"
         }
       }
     }
   },
   "engines": {
-    "node": "24.11.0",
+    "node": "24.11.1",
     "fdk": "10.1.2"
+  },
+  "scripts": {
+    "fdk-unit-test": "vitest run --coverage"
   }
 }

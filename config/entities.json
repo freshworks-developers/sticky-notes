@@ -12,6 +12,12 @@
         "name": "note_content",
         "label": "Note Content",
         "type": "paragraph"
+      },
+      {
+        "name": "note_color",
+        "label": "Note Color",
+        "type": "text",
+        "filterable": true
       }
     ]
   }

@@ -1,130 +1,154 @@
-# Agent Huddle - Sticky Notes
+<p align="center">
+  <img src="sticky-notes.png" alt="Agent Huddle — Sticky Notes sample app" width="100%" />
+</p>
 
-A Freshworks Platform 3.0 sample app that provides a "Sticky Note" area in the ticket sidebar using **Entity Storage (Custom Objects)**.
+# Agent Huddle — Sticky Notes
+
+A Freshworks Platform 3.0 **React Meta** sample app that lets agents pin colored sticky notes to tickets using **Entity Storage**, with a full-page **Agent Huddle** board for viewing and managing notes across tickets.
 
 ## Description
 
-Often, agents need to leave "private context" on a ticket that isn't a formal private note—like a temporary reminder or a "heads up" for the next shift. This app provides a "Sticky Note" area in the sidebar that saves data specifically to that ticket using the platform's own storage.
+Agents often need lightweight, ticket-scoped reminders — shift handoffs, VIP flags, or follow-up context that is not a formal private note. Sticky Notes provides a post-it style sidebar on each ticket and a consolidated full-page board so the team can see pinned context at a glance.
 
-Currently, native private notes do not allow an agent to view all the ticket notes in a consolidated view to act upon it or take decisions based on the same. **Sticky-Notes** is an easy-to-use, and customizable app that lets agents view important ticket notes when agents change shifts.
+### Core Functionality
 
-### Core Functionality: Entity Storage (Custom Objects)
-
-The heart of this app is **Entity Storage**, which allows for structured data persistence. Unlike simple key-value storage, Entity Storage enables:
-- **Relational Data**: Notes are linked to specific `ticket_id`s.
-- **Advanced Querying**: Efficiently fetching all notes or filtering by specific fields.
-- **Structured Schemas**: Defined fields for `ticket_id` and `note_content`.
+1. **Pin a note on a ticket** — pick a color, preview the card live, and save one sticky note per ticket in Entity Storage.
+2. **Revisit and update** — reopening the ticket sidebar loads the saved note for that ticket automatically.
+3. **Browse the huddle board** — the full-page app lists all pinned notes plus sample cards for demo; edit or delete with icon actions.
 
 ## User Interfaces
 
-The app provides two distinct interfaces to interact with the stored notes:
+| Surface | Placement | Behavior |
+| --- | --- | --- |
+| `app/ticketSidebar.html` | `support_ticket.ticket_sidebar` | Color picker, live preview card, textarea, **Pin it!** / **Update note** |
+| `app/index.html` | `common.full_page_app` | **Agent Huddle** grid of pinned notes with edit/delete icons |
 
-1. **Ticket Sidebar** - A sticky note text area where agents can quickly jot down private context for the current ticket. Notes are automatically loaded when revisiting a ticket.
-<img src="screenshots/1.png" width="400" alt="Ticket Sidebar">
+### Ticket Sidebar
 
-2. **Full Page App** - A dashboard displaying all saved notes across tickets with edit and delete capabilities.
-<img src="screenshots/2.png" width="600" alt="Full Page App">
+- Loads the sticky note saved for the **current ticket** (`client.data.get('ticket')`).
+- Five color swatches: yellow, pink, green, blue, orange.
+- Live preview card with pin and drop shadow.
+- Creates a new note on first pin; subsequent saves update the same record.
+- Toast feedback via `showNotify`; iframe height adjusted with `client.instance.resize()`.
+
+### Full-Page Board
+
+- Fetches all notes from Entity Storage with pagination support.
+- Always shows **six sample sticky notes** (tagged **Sample**) for demo; saved notes appear first.
+- Each card has **edit** and **delete** icon buttons (bottom-right).
+- Edit opens a modal with color picker and textarea; delete confirms before removal.
+- Sample notes can be edited or hidden in-session (changes reset on refresh).
 
 ## Platform 3.0 Features Used
 
 ### 1. Entity Storage (Custom Objects)
 
-The app uses Entity Storage to persist notes across sessions. This demonstrates the full CRUD lifecycle:
+Notes are stored in the `ticket_notes` entity with filterable fields for efficient per-ticket queries.
 
-| Operation | Method | Description |
-|-----------|--------|-------------|
-| **Create** | `entity.create()` | Creates a new note record |
-| **Read** | `entity.getAll()` with query | Fetches notes filtered by ticket_id |
-| **Update** | `entity.update(display_id, data)` | Updates existing note content |
-| **Delete** | `entity.delete(display_id)` | Removes a note record |
+| Operation | Method | Where used |
+| --- | --- | --- |
+| Create | `entity.create()` | Sidebar — first pin |
+| Read | `entity.getAll({ query })` | Sidebar — load by `ticket_id`; board — fetch all |
+| Update | `entity.update(display_id, data)` | Sidebar — update note; board — edit modal |
+| Delete | `entity.delete(display_id)` | Board — delete modal |
 
-**Entity Schema** (`config/entities.json`):
+**Entity schema** (`config/entities.json`):
+
 ```json
 {
   "ticket_notes": {
     "fields": [
       { "name": "ticket_id", "type": "text", "filterable": true, "required": true },
-      { "name": "note_content", "type": "paragraph" }
+      { "name": "note_content", "type": "paragraph" },
+      { "name": "note_color", "type": "text", "filterable": true }
     ]
   }
 }
 ```
 
-**Key Implementation:**
+**Query by ticket:**
+
 ```javascript
-// Initialize Entity Storage with versioned interface
-const entity = client.db.entity({ version: "v1" });
-const ticketNotes = entity.get("ticket_notes");
+const entity = client.db.entity({ version: 'v1' });
+const ticketNotes = entity.get('ticket_notes');
 
-// Query with filterable field
 const result = await ticketNotes.getAll({
-  query: { ticket_id: ticketId }
+  query: { ticket_id: String(ticketId) }
 });
-
 ```
 
 ### 2. Data Methods
-
-Used to fetch current ticket context:
 
 ```javascript
 const ticketData = await client.data.get('ticket');
 const ticketId = String(ticketData.ticket.id);
 ```
 
-### 3. Interface Methods (showNotify)
-
-Triggers native toast notifications in the ticket sidebar:
+### 3. Interface Methods
 
 ```javascript
-await client.interface.trigger("showNotify", {
-  type: "success",
-  message: "Note pinned to ticket!"
+await client.interface.trigger('showNotify', {
+  type: 'success',
+  title: 'Sticky note',
+  message: 'Sticky note pinned to this ticket!'
 });
 ```
 
-### 4. Events Methods
-
-Listens for app activation to load data:
+### 4. Instance Methods
 
 ```javascript
-client.events.on('app.activated', loadExistingNote);
+client.instance.resize({ height: '520px' });
 ```
 
-### 5. Crayons UI Components
+### 5. React Meta + Crayons
 
-The app uses Freshworks Crayons v4 design system:
+Built with `metaConfig.framework: "react"`. UI uses Crayons React components:
 
 | Component | Usage |
-|-----------|-------|
-| `<fw-label>` | Section titles |
-| `<fw-textarea>` | Note input field |
-| `<fw-button>` | Action buttons (Save, Edit, Delete) |
-| `<fw-modal>` | Edit and delete confirmation dialogs |
-| `<fw-spinner>` | Loading state indicator |
+| --- | --- |
+| `<FwTextarea>` | Note input in sidebar and edit modal |
+| `<FwButton>` | Pin, update, refresh, modal actions |
+| `<FwModal>` | Edit and delete confirmation on full-page board |
+| `<FwSpinner>` | Loading states |
+| `<FwIcon>` | Edit and delete icons on board cards |
 
 ## Project Structure
 
 ```
 ├── app/
-│   ├── index.html          # Ticket sidebar UI
-│   ├── full_page.html      # Full page app UI
-│   ├── scripts/
-│   │   ├── app.js          # Ticket sidebar logic
-│   │   └── full_page.js    # Full page app logic
-│   └── styles/
-│       ├── style.css       # Sidebar styles
-│       └── full_page.css   # Full page styles
+│   ├── index.html                 # Full-page Agent Huddle board
+│   ├── ticketSidebar.html         # Ticket sidebar surface
+│   ├── public/icon.svg            # React Meta app icon (required path)
+│   ├── components/
+│   │   ├── index.jsx              # Full-page React entry
+│   │   ├── FullPageApp.jsx        # Notes grid, modals, sample merge
+│   │   ├── bootstrap/crayonsInit.js
+│   │   ├── lib/
+│   │   │   ├── noteColors.js      # Five color tokens
+│   │   │   ├── notesService.js    # Entity Storage CRUD helpers
+│   │   │   └── sampleNotes.js     # Demo cards for full-page board
+│   │   ├── ui/
+│   │   │   ├── StickyNoteCard.jsx # Pinned post-it card + pin
+│   │   │   └── ColorPicker.jsx    # Sidebar color swatches
+│   │   └── placeholders/
+│   │       ├── ticketSidebar.jsx  # Sidebar React entry
+│   │       ├── TicketSidebarApp.jsx
+│   │       └── PlaceholderWrapper.jsx
+│   └── styles/style.css
 ├── config/
-│   └── entities.json       # Entity Storage schema
-└── manifest.json           # App configuration
+│   └── entities.json              # Entity Storage schema
+├── tests/
+│   └── app.test.js                # Vitest — colors, notes service, samples
+├── manifest.json                  # React Meta + full_page_app + ticket_sidebar
+├── package.json
+└── vitest.config.js
 ```
 
 ## Prerequisites
 
-- [Freshworks CLI (FDK)](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/basic-dev-tools/freshworks-cli//) v9.1.1 or later
-- Node.js v18.x
-- A Freshdesk or Freshservice trial account
+- [Freshworks CLI (FDK)](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/basic-dev-tools/freshworks-cli/) v10.1.2 or later
+- Node.js v24.x
+- A Freshdesk trial account
 
 ## Local Development
 
@@ -134,38 +158,52 @@ The app uses Freshworks Crayons v4 design system:
    cd sticky-notes
    ```
 
-2. Run the app locally:
+2. Install dependencies and validate:
+   ```bash
+   npm install
+   fdk validate
+   ```
+
+3. Run the app locally:
    ```bash
    fdk run
    ```
 
-3. Open your Freshdesk/Freshservice account with `?dev=true`:
+4. Open Freshdesk with `?dev=true`:
    ```
-   https://your-domain.freshdesk.com/helpdesk/tickets/1?dev=true
+   https://your-domain.freshdesk.com/a/tickets/1?dev=true
    ```
 
-## Testing Entity Storage
+5. Test both surfaces:
+   - **Ticket sidebar** — open a ticket, pin a colored note.
+   - **Full-page app** — Admin → Agent Huddle (or your configured full-page location).
 
-The FDK creates a local `.sqlite` file to simulate Entity Storage during development. To reset the data:
+## Testing
 
 ```bash
-# Stop the server and delete the SQLite file
+npm test
+```
+
+### Reset Entity Storage
+
+FDK simulates Entity Storage locally in `.fdk/store.sqlite`. Reset after schema changes or a clean slate:
+
+```bash
 rm .fdk/store.sqlite
 fdk run
 ```
 
 ## Key Learnings
 
-1. **Entity Storage vs Key-Value Storage**: Entity Storage supports querying with filterable fields, pagination, and structured schemas - ideal for relational data.
-
-2. **Versioned Interface**: Always use `client.db.entity({ version: "v1" })` to access Entity Storage.
-
-3. **Crayons Events**: Crayons components emit custom events like `fwSubmit` instead of standard DOM events.
-
-4. **App State Management**: Use an IIFE with a state object to avoid scope issues in async operations.
+1. **Entity Storage vs key-value** — filterable `ticket_id` enables efficient per-ticket queries without scanning all records.
+2. **React Meta icons** — place `icon.svg` under `app/public/`; FDK resolves manifest `"icon": "icon.svg"` from there.
+3. **One note per ticket in sidebar** — load with `getAll({ query: { ticket_id } })` and update via `display_id` on save.
+4. **Full-page sample data** — demo cards live in `sampleNotes.js` and merge with saved records for a populated board on first run.
 
 ## Resources
 
-- [Entity Storage Documentation](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/data-store/entity-storage/)
-- [Crayons Components](https://crayons.freshworks.com/)
+- [Entity Storage](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/data-store/entity-storage/)
+- [React Meta apps](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/front-end-apps/react-apps/)
+- [Data Methods](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/front-end-apps/data-method/)
 - [Interface Methods](https://developers.freshworks.com/docs/app-sdk/v3.0/support_ticket/front-end-apps/interface-methods/)
+- [Crayons React](https://crayons.freshworks.com/)

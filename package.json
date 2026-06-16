@@ -1,0 +1,21 @@
+{
+  "name": "sticky-notes",
+  "version": "1.0.0",
+  "description": "Agent Huddle sticky notes — React Meta sample with Entity Storage",
+  "dependencies": {
+    "@freshworks/crayons": "^4.2.0",
+    "react": "~18.2.0",
+    "react-dom": "~18.2.0"
+  },
+  "scripts": {
+    "test": "vitest run --coverage",
+    "fdk-unit-test": "vitest run --coverage"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "~7.24.0",
+    "@babel/preset-react": "~7.23.3",
+    "@vitest/coverage-v8": "~2.1.8",
+    "jsdom": "~26.1.0",
+    "vitest": "~2.1.8"
+  }
+}
