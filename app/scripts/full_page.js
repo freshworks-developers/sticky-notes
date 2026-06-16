@@ -69,21 +69,6 @@
     }
   }
 
-  async function refreshTable() {
-    try {
-      appState.records = await fetchAllRecords();
-
-      if (appState.records.length === 0) {
-        showEmptyState();
-        return;
-      }
-
-      displayTable(appState.records);
-    } catch (error) {
-      console.error('Error refreshing table:', error);
-    }
-  }
-
   function createTableRow(record, index) {
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -154,7 +139,9 @@
         ticket_id: ticketId,
         note_content: newContent
       });
-    } catch (e) { }
+    } catch (error) {
+      console.error('Error updating note:', error);
+    }
 
     const idx = appState.records.findIndex(r => r.display_id === displayId);
     if (idx !== -1) {
@@ -182,7 +169,9 @@
 
     try {
       await appState.ticketNotes.delete(displayId);
-    } catch (e) { }
+    } catch (error) {
+      console.error('Error deleting note:', error);
+    }
 
     appState.records = appState.records.filter(r => r.display_id !== displayId);
     
@@ -210,7 +199,8 @@
       return new Date(isoDate).toLocaleDateString('en-US', {
         year: 'numeric', month: 'short', day: 'numeric'
       });
-    } catch (e) {
+    } catch (error) {
+      console.error('Error formatting date:', error);
       return isoDate;
     }
   }
