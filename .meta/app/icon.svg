@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="Sticky Notes">
-  <rect width="64" height="64" rx="8" fill="#fff176"/>
-  <circle cx="32" cy="12" r="6" fill="#e53935"/>
-  <rect x="14" y="22" width="36" height="4" rx="2" fill="#5d4e00" opacity="0.35"/>
-  <rect x="14" y="30" width="28" height="4" rx="2" fill="#5d4e00" opacity="0.25"/>
-  <rect x="14" y="38" width="32" height="4" rx="2" fill="#5d4e00" opacity="0.25"/>
-</svg>
